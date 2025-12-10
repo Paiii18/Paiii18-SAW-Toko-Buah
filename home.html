@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - SPK Toko Buah Segar Manis</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>"
+    />
+  </head>
+  <body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">🍎</div>
+          <div class="logo-text">
+            <h3>Segar Manis</h3>
+            <p>Bogor</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item active">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="input_produk.html" class="nav-item">
+          <span class="icon">📦</span>
+          <span>Produk</span>
+        </a>
+        <a href="input_kriteria.html" class="nav-item">
+          <span class="icon">⚖️</span>
+          <span>Kriteria</span>
+        </a>
+        <a href="input_bobot.html" class="nav-item">
+          <span class="icon">⚙️</span>
+          <span>Bobot</span>
+        </a>
+        <a href="input_nilai.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Data Penjualan</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item">
+          <span class="icon">🧮</span>
+          <span>Skor Produk</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item">
+          <span class="icon">📈</span>
+          <span>Perhitungan SAW</span>
+        </a>
+        <a href="laporan.html" class="nav-item">
+          <span class="icon">📄</span>
+          <span>Laporan</span>
+        </a>
+        <a href="master_data.html" class="nav-item">
+          <span class="icon">👤</span>
+          <span>Pengguna</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="toggle-menu" onclick="toggleSidebar()">
+          <span>◀</span>
+          <span>Tutup Menu</span>
+        </button>
+        <a href="#" class="nav-item settings">
+          <span class="icon">⚙️</span>
+          <span>Pengaturan</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="search-box">
+          <input type="text" placeholder="Cari produk, laporan..." />
+          <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="topbar-right">
+          <div class="notification">
+            <span class="icon">🔔</span>
+            <span class="badge">3</span>
+          </div>
+
+          <div class="user-profile">
+            <div class="avatar">A</div>
+            <div class="user-info">
+              <span class="user-name" id="userName">Ahmad Wijaya</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">▼</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        <div class="dashboard-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p>
+              Selamat datang di Sistem Pendukung Keputusan Segar Manis Bogor
+            </p>
+          </div>
+          <div class="dashboard-date" id="currentDate">November 2025</div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green">📦</div>
+            <div class="stat-info">
+              <h3>Total Produk</h3>
+              <p class="stat-number" id="totalProduk">10</p>
+              <p class="stat-desc">Jenis buah</p>
+              <p class="stat-change positive">+12% vs bulan lalu</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange">📈</div>
+            <div class="stat-info">
+              <h3>Total Penjualan</h3>
+              <p class="stat-number" id="totalPenjualan">3.100</p>
+              <p class="stat-desc">Unit terjual</p>
+              <p class="stat-change positive">+8% vs bulan lalu</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon yellow">🏆</div>
+            <div class="stat-info">
+              <h3>Produk Terlaris</h3>
+              <p class="stat-number" id="produkTerlaris">Pisang</p>
+              <p class="stat-desc">
+                Skor: <span id="skorTerlaris">82.4%</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon blue">💰</div>
+            <div class="stat-info">
+              <h3>Total Pendapatan</h3>
+              <p class="stat-number" id="totalPendapatan">Rp 93.135.000</p>
+              <p class="stat-desc">Bulan ini</p>
+              <p class="stat-change positive">+15% vs bulan lalu</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Penjualan Produk</h3>
+            <p class="chart-subtitle">Volume penjualan per produk</p>
+            <div class="chart-placeholder" id="chartPenjualan">
+              <canvas id="salesChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Distribusi Kategori</h3>
+            <p class="chart-subtitle">Pendapatan per kategori</p>
+            <div class="chart-placeholder" id="chartKategori">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
