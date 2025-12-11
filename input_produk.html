@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Produk - SPK Toko Buah Segar Manis</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">🍎</div>
+          <div class="logo-text">
+            <h3>Segar Manis</h3>
+            <p>Bogor</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="input_produk.html" class="nav-item active">
+          <span class="icon">📦</span>
+          <span>Produk</span>
+        </a>
+        <a href="input_kriteria.html" class="nav-item">
+          <span class="icon">⚖️</span>
+          <span>Kriteria</span>
+        </a>
+        <a href="input_bobot.html" class="nav-item">
+          <span class="icon">⚙️</span>
+          <span>Bobot</span>
+        </a>
+        <a href="input_nilai.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Data Penjualan</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item">
+          <span class="icon">🧮</span>
+          <span>Skor Produk</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item">
+          <span class="icon">📈</span>
+          <span>Perhitungan SAW</span>
+        </a>
+        <a href="laporan.html" class="nav-item">
+          <span class="icon">📄</span>
+          <span>Laporan</span>
+        </a>
+        <a href="master_data.html" class="nav-item">
+          <span class="icon">👤</span>
+          <span>Pengguna</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="toggle-menu" onclick="toggleSidebar()">
+          <span>◀</span>
+          <span>Tutup Menu</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="search-box">
+          <input type="text" placeholder="Cari produk..." id="searchProduk" />
+          <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="topbar-right">
+          <div class="notification">
+            <span class="icon">🔔</span>
+            <span class="badge">3</span>
+          </div>
+
+          <div class="user-profile">
+            <div class="avatar">A</div>
+            <div class="user-info">
+              <span class="user-name" id="userName">Administrator</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">▼</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dashboard-content">
+        <div class="page-header">
+          <div>
+            <h1>Data Produk</h1>
+            <p>Kelola data produk buah</p>
+          </div>
+          <button class="btn-primary" onclick="openModal()">
+            <span>➕</span> Tambah Produk
+          </button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Daftar Produk</h3>
+            <div class="table-actions">
+              <select id="filterKategori" class="filter-select">
+                <option value="">Semua Kategori</option>
+                <option value="Lokal">Lokal</option>
+                <option value="Import">Import</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Kode Produk</th>
+                  <th>Nama Produk</th>
+                  <th>Kategori</th>
+                  <th>Satuan</th>
+                  <th>Keterangan</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="produkTableBody">
+                <tr>
+                  <td colspan="7" class="text-center">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal Form -->
+    <div id="modalProduk" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Tambah Produk</h2>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+
+        <form id="formProduk">
+          <input type="hidden" id="produkId" />
+
+          <div class="form-group">
+            <label for="kodeProduk"
+              >Kode Produk <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="kodeProduk"
+              required
+              placeholder="Contoh: PRD001"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="namaProduk"
+              >Nama Produk <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="namaProduk"
+              required
+              placeholder="Contoh: Apel Fuji"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="kategori"
+                >Kategori <span class="required">*</span></label
+              >
+              <select id="kategori" required>
+                <option value="">Pilih Kategori</option>
+                <option value="Lokal">Lokal</option>
+                <option value="Import">Import</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="satuan">Satuan <span class="required">*</span></label>
+              <select id="satuan" required>
+                <option value="">Pilih Satuan</option>
+                <option value="Kg">Kg</option>
+                <option value="Buah">Buah</option>
+                <option value="Ikat">Ikat</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="keterangan">Keterangan</label>
+            <textarea
+              id="keterangan"
+              rows="3"
+              placeholder="Keterangan tambahan (opsional)"
+            ></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeModal()">
+              Batal
+            </button>
+            <button type="submit" class="btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/produk.js"></script>
+    <script>
+      // Auth check
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+      if (!isLoggedIn || isLoggedIn !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // Load user data
+      const userData = JSON.parse(sessionStorage.getItem("user") || "{}");
+      if (userData.nama_lengkap) {
+        const userNameElement = document.getElementById("userName");
+        if (userNameElement) {
+          userNameElement.textContent = userData.nama_lengkap;
+        }
+
+        const avatar = document.querySelector(".avatar");
+        if (avatar && userData.nama_lengkap) {
+          avatar.textContent = userData.nama_lengkap.charAt(0).toUpperCase();
+        }
+      }
+
+      // Modal functions (Global scope)
+      function openModal() {
+        const modal = document.getElementById("modalProduk");
+        if (modal) {
+          modal.classList.add("show");
+        }
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("modalProduk");
+        if (modal) {
+          modal.classList.remove("show");
+        }
+        if (window.produkManager) {
+          window.produkManager.resetForm();
+        }
+      }
+
+      // Close modal when clicking outside
+      window.onclick = function (event) {
+        const modal = document.getElementById("modalProduk");
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+
+      // Logout function
+      async function handleLogout() {
+        if (!confirm("Apakah Anda yakin ingin logout?")) {
+          return;
+        }
+        try {
+          await fetch("api/logout_api.php", { method: "POST" });
+          sessionStorage.clear();
+          window.location.href = "login.html";
+        } catch (error) {
+          sessionStorage.clear();
+          window.location.href = "login.html";
+        }
+      }
+
+      // Toggle sidebar
+      function toggleSidebar() {
+        const sidebar = document.querySelector(".sidebar");
+        const mainContent = document.querySelector(".main-content");
+        sidebar.classList.toggle("collapsed");
+        if (sidebar.classList.contains("collapsed")) {
+          mainContent.style.marginLeft = "70px";
+        } else {
+          mainContent.style.marginLeft = "250px";
+        }
+      }
+    </script>
+  </body>
+</html>
