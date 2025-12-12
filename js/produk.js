@@ -86,7 +86,7 @@ class ProdukManager {
 
     if (!data || data.length === 0) {
       tbody.innerHTML =
-        '<tr><td colspan="7" class="text-center">Tidak ada data produk</td></tr>';
+        '<tr><td colspan="8" class="text-center">Tidak ada data produk</td></tr>';
       return;
     }
 
@@ -99,7 +99,8 @@ class ProdukManager {
                 <td>${item.nama_produk}</td>
                 <td>${item.kategori || "-"}</td>
                 <td>${item.satuan || "-"}</td>
-                <td>${item.keterangan || "-"}</td>
+                <td>Rp ${this.formatRupiah(item.harga)}</td>
+                <td>${item.stok}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-edit" onclick="window.produkManager.edit(${
@@ -121,6 +122,13 @@ class ProdukManager {
   }
 
   /**
+   * Format number to Rupiah
+   */
+  formatRupiah(angka) {
+    return new Intl.NumberFormat("id-ID").format(angka);
+  }
+
+  /**
    * Handle form submit (create/update)
    */
   async handleSubmit(e) {
@@ -132,7 +140,8 @@ class ProdukManager {
     formData.append("nama_produk", document.getElementById("namaProduk").value);
     formData.append("kategori", document.getElementById("kategori").value);
     formData.append("satuan", document.getElementById("satuan").value);
-    formData.append("keterangan", document.getElementById("keterangan").value);
+    formData.append("harga", document.getElementById("harga").value);
+    formData.append("stok", document.getElementById("stok").value);
 
     if (this.currentId) {
       formData.append("id", this.currentId);
@@ -187,7 +196,8 @@ class ProdukManager {
         document.getElementById("namaProduk").value = data.nama_produk;
         document.getElementById("kategori").value = data.kategori || "";
         document.getElementById("satuan").value = data.satuan || "";
-        document.getElementById("keterangan").value = data.keterangan || "";
+        document.getElementById("harga").value = data.harga || 0;
+        document.getElementById("stok").value = data.stok || 0;
 
         openModal();
       } else {

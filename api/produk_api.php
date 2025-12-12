@@ -91,7 +91,8 @@ function createProduk($conn) {
     $nama_produk = isset($_POST['nama_produk']) ? trim($_POST['nama_produk']) : '';
     $kategori = isset($_POST['kategori']) ? trim($_POST['kategori']) : '';
     $satuan = isset($_POST['satuan']) ? trim($_POST['satuan']) : '';
-    $keterangan = isset($_POST['keterangan']) ? trim($_POST['keterangan']) : '';
+    $harga = isset($_POST['harga']) ? trim($_POST['harga']) : 0;
+    $stok = isset($_POST['stok']) ? trim($_POST['stok']) : 0;
     
     if (empty($kode_produk) || empty($nama_produk)) {
         sendResponse(false, 'Kode produk dan nama produk harus diisi!');
@@ -108,15 +109,16 @@ function createProduk($conn) {
     }
     
     // Insert data
-    $query = "INSERT INTO produk (kode_produk, nama_produk, kategori, satuan, keterangan) 
-              VALUES (:kode_produk, :nama_produk, :kategori, :satuan, :keterangan)";
+    $query = "INSERT INTO produk (kode_produk, nama_produk, kategori, satuan, harga, stok) 
+              VALUES (:kode_produk, :nama_produk, :kategori, :satuan, :harga, :stok)";
     
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':kode_produk', $kode_produk);
     $stmt->bindParam(':nama_produk', $nama_produk);
     $stmt->bindParam(':kategori', $kategori);
     $stmt->bindParam(':satuan', $satuan);
-    $stmt->bindParam(':keterangan', $keterangan);
+    $stmt->bindParam(':harga', $harga);
+    $stmt->bindParam(':stok', $stok);
     
     if ($stmt->execute()) {
         sendResponse(true, 'Produk berhasil ditambahkan!');
@@ -135,7 +137,8 @@ function updateProduk($conn) {
     $nama_produk = isset($_POST['nama_produk']) ? trim($_POST['nama_produk']) : '';
     $kategori = isset($_POST['kategori']) ? trim($_POST['kategori']) : '';
     $satuan = isset($_POST['satuan']) ? trim($_POST['satuan']) : '';
-    $keterangan = isset($_POST['keterangan']) ? trim($_POST['keterangan']) : '';
+    $harga = isset($_POST['harga']) ? trim($_POST['harga']) : 0;
+    $stok = isset($_POST['stok']) ? trim($_POST['stok']) : 0;
     
     if (!$id || empty($kode_produk) || empty($nama_produk)) {
         sendResponse(false, 'Data tidak lengkap!');
@@ -158,7 +161,8 @@ function updateProduk($conn) {
                   nama_produk = :nama_produk,
                   kategori = :kategori,
                   satuan = :satuan,
-                  keterangan = :keterangan
+                  harga = :harga,
+                  stok = :stok
               WHERE id = :id";
     
     $stmt = $conn->prepare($query);
@@ -166,7 +170,8 @@ function updateProduk($conn) {
     $stmt->bindParam(':nama_produk', $nama_produk);
     $stmt->bindParam(':kategori', $kategori);
     $stmt->bindParam(':satuan', $satuan);
-    $stmt->bindParam(':keterangan', $keterangan);
+    $stmt->bindParam(':harga', $harga);
+    $stmt->bindParam(':stok', $stok);
     $stmt->bindParam(':id', $id);
     
     if ($stmt->execute()) {

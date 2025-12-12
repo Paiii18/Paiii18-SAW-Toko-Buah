@@ -130,13 +130,14 @@
                   <th>Nama Produk</th>
                   <th>Kategori</th>
                   <th>Satuan</th>
-                  <th>Keterangan</th>
+                  <th>Harga</th>
+                  <th>Stok</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="produkTableBody">
                 <tr>
-                  <td colspan="7" class="text-center">Loading...</td>
+                  <td colspan="8" class="text-center">Loading...</td>
                 </tr>
               </tbody>
             </table>
@@ -203,13 +204,25 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="keterangan">Keterangan</label>
-            <textarea
-              id="keterangan"
-              rows="3"
-              placeholder="Keterangan tambahan (opsional)"
-            ></textarea>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="harga"
+                >Harga (Rp) <span class="required">*</span></label
+              >
+              <input
+                type="number"
+                id="harga"
+                required
+                placeholder="0"
+                min="0"
+                step="100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="stok">Stok <span class="required">*</span></label>
+              <input type="number" id="stok" required placeholder="0" min="0" />
+            </div>
           </div>
 
           <div class="modal-footer">
