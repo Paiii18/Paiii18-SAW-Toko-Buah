@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Data Penjualan - SPK Toko Buah Segar Manis</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>"
-    />
+    <link rel="icon" type="image/png" href="asset/images/logo.png" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body class="dashboard-body">
@@ -15,9 +12,15 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <div class="logo-icon">🍎</div>
+          <div class="logo-icon">
+            <img
+              src="asset/images/logo.png"
+              alt="Logo"
+              style="width: 100%; height: 100%; object-fit: contain"
+            />
+          </div>
           <div class="logo-text">
-            <h3>Segar Manis</h3>
+            <h3>Buah Segar Manis</h3>
             <p>Bogor</p>
           </div>
         </div>
@@ -48,11 +51,7 @@
           <span class="icon">📄</span>
           <span>Laporan</span>
         </a>
-        <a href="master_data.html" class="nav-item">
-          <span class="icon">👤</span>
-          <span>Pengguna</span>
-        </a>
-      </nav>
+              </nav>
 
       <div class="sidebar-footer">
         <button class="toggle-menu" onclick="toggleSidebar()">
@@ -62,32 +61,29 @@
       </div>
     </aside>
 
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
     <!-- Main Content -->
     <main class="main-content">
       <!-- Top Bar -->
       <header class="topbar">
-        <div class="search-box">
-          <input
-            type="text"
-            placeholder="Cari produk, laporan..."
-            id="searchNilai"
-          />
-          <span class="search-icon">🔍</span>
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+        <div class="topbar-title">
+          <h2>Data Penjualan</h2>
         </div>
 
         <div class="topbar-right">
-          <div class="notification">
-            <span class="icon">🔔</span>
-            <span class="badge">3</span>
-          </div>
-
-          <div class="user-profile">
+          <div class="user-profile" onclick="toggleUserDropdown()">
             <div class="avatar">A</div>
             <div class="user-info">
               <span class="user-name" id="userName">Administrator</span>
               <span class="user-role">Administrator</span>
             </div>
-            <button class="logout-btn" onclick="handleLogout()">▼</button>
+            <button class="logout-btn">▼</button>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="#" onclick="handleLogout(); return false;">Keluar</a>
+            </div>
           </div>
         </div>
       </header>
@@ -99,22 +95,9 @@
             <h1>Data Penjualan</h1>
             <p>Kelola data penjualan produk</p>
           </div>
-          <div style="display: flex; gap: 10px">
-            <input
-              type="text"
-              placeholder="Cari penjualan..."
-              id="searchPenjualan"
-              style="
-                padding: 10px 15px;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                width: 250px;
-              "
-            />
-            <button class="btn-primary" onclick="openModal()">
-              <span>➕</span> Tambah Data
-            </button>
-          </div>
+          <button class="btn-primary" onclick="openModal()">
+            <span>➕</span> Tambah Data
+          </button>
         </div>
 
         <!-- Info Box -->
@@ -125,6 +108,17 @@
 
         <!-- Table Card -->
         <div class="table-card">
+          <div class="table-header">
+            <h3>Daftar Data Penjualan</h3>
+            <div class="table-actions">
+              <input
+                type="text"
+                placeholder="Cari penjualan..."
+                id="searchPenjualan"
+                class="search-input"
+              />
+            </div>
+          </div>
           <div class="table-responsive">
             <table class="data-table">
               <thead>
@@ -236,7 +230,8 @@
           <div class="form-row">
             <div class="form-group">
               <label for="margin"
-                >Margin Keuntungan (%) - C3 <span class="required">*</span></label
+                >Margin Keuntungan (%) - C3
+                <span class="required">*</span></label
               >
               <input
                 type="number"
@@ -247,12 +242,15 @@
                 max="100"
                 step="0.1"
               />
-              <small style="color: #666;">Persentase keuntungan dari penjualan</small>
+              <small style="color: #666"
+                >Persentase keuntungan dari penjualan</small
+              >
             </div>
 
             <div class="form-group">
               <label for="kerusakan"
-                >Tingkat Kerusakan (%) - C5 <span class="required">*</span></label
+                >Tingkat Kerusakan (%) - C5
+                <span class="required">*</span></label
               >
               <input
                 type="number"
@@ -263,7 +261,10 @@
                 max="100"
                 step="0.1"
               />
-              <small style="color: #666;">Persentase produk rusak/busuk (semakin kecil semakin baik)</small>
+              <small style="color: #666"
+                >Persentase produk rusak/busuk (semakin kecil semakin
+                baik)</small
+              >
             </div>
           </div>
 
@@ -326,32 +327,6 @@
         }
       };
 
-      // Logout function
-      async function handleLogout() {
-        if (!confirm("Apakah Anda yakin ingin logout?")) {
-          return;
-        }
-        try {
-          await fetch("api/logout_api.php", { method: "POST" });
-          sessionStorage.clear();
-          window.location.href = "login.html";
-        } catch (error) {
-          sessionStorage.clear();
-          window.location.href = "login.html";
-        }
-      }
-
-      // Toggle sidebar
-      function toggleSidebar() {
-        const sidebar = document.querySelector(".sidebar");
-        const mainContent = document.querySelector(".main-content");
-        sidebar.classList.toggle("collapsed");
-        if (sidebar.classList.contains("collapsed")) {
-          mainContent.style.marginLeft = "70px";
-        } else {
-          mainContent.style.marginLeft = "250px";
-        }
-      }
     </script>
   </body>
 </html>
