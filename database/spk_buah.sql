@@ -79,6 +79,26 @@ CREATE TABLE `penilaian` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `penilaian`
+--
+
+INSERT INTO `penilaian` (`id`, `produk_id`, `kriteria_id`, `nilai`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 450.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(2, 1, 2, 15750000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(3, 2, 1, 380.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(4, 2, 2, 10640000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(5, 3, 1, 290.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(6, 3, 2, 13050000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(7, 4, 1, 620.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(8, 4, 2, 11160000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(9, 5, 1, 180.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(10, 5, 2, 4500000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(11, 6, 1, 95.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(12, 6, 2, 8075000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(13, 7, 1, 320.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(14, 7, 2, 7040000.00, '2025-12-10 02:11:31', '2025-12-10 02:11:31');
+
 -- --------------------------------------------------------
 
 --
@@ -95,6 +115,19 @@ CREATE TABLE `produk` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `produk`
+--
+
+INSERT INTO `produk` (`id`, `kode_produk`, `nama_produk`, `kategori`, `satuan`, `keterangan`, `created_at`, `updated_at`) VALUES
+(1, 'P001', 'Mangga Harum Manis', 'Lokal', 'Kg', 'Mangga kualitas premium', '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(2, 'P002', 'Jeruk Medan', 'Lokal', 'Kg', 'Jeruk segar dari Medan', '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(3, 'P003', 'Apel Malang', 'Lokal', 'Kg', 'Apel dari Malang', '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(4, 'P004', 'Pisang Cavendish', 'Import', 'Kg', 'Pisang Cavendish berkualitas', '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(5, 'P005', 'Semangka Merah', 'Lokal', 'Buah', 'Semangka merah manis', '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(6, 'P006', 'Anggur Merah', 'Import', 'Kg', 'Anggur merah segar', '2025-12-10 02:11:31', '2025-12-10 02:11:31'),
+(7, 'P007', 'Pepaya California', 'Import', 'Buah', 'Pepaya California', '2025-12-10 02:11:31', '2025-12-10 02:11:31');
 
 -- --------------------------------------------------------
 
@@ -179,13 +212,13 @@ ALTER TABLE `kriteria`
 -- AUTO_INCREMENT for table `penilaian`
 --
 ALTER TABLE `penilaian`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
