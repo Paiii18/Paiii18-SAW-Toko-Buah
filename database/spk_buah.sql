@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Dec 10, 2025 at 03:01 AM
+-- Generation Time: Dec 27, 2025 at 07:42 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -20,6 +20,23 @@ SET time_zone = "+00:00";
 --
 -- Database: `spk_buah`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `data_penjualan`
+--
+
+CREATE TABLE `data_penjualan` (
+  `id` int NOT NULL,
+  `produk_id` int NOT NULL,
+  `bulan` varchar(20) NOT NULL,
+  `tahun` int NOT NULL,
+  `kuantitas` int NOT NULL DEFAULT '0',
+  `pendapatan` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -67,21 +84,6 @@ INSERT INTO `kriteria` (`id`, `kode_kriteria`, `nama_kriteria`, `bobot`, `jenis`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `penilaian`
---
-
-CREATE TABLE `penilaian` (
-  `id` int NOT NULL,
-  `produk_id` int NOT NULL,
-  `kriteria_id` int NOT NULL,
-  `nilai` decimal(10,2) NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `produk`
 --
 
@@ -91,10 +93,21 @@ CREATE TABLE `produk` (
   `nama_produk` varchar(100) NOT NULL,
   `kategori` varchar(50) DEFAULT NULL,
   `satuan` varchar(20) DEFAULT NULL,
+  `stok` int DEFAULT NULL,
+  `harga` decimal(12,2) DEFAULT NULL,
   `keterangan` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `produk`
+--
+
+INSERT INTO `produk` (`id`, `kode_produk`, `nama_produk`, `kategori`, `satuan`, `stok`, `harga`, `keterangan`, `created_at`, `updated_at`) VALUES
+(1, 'PS1', 'Pisang Ambon', 'Lokal', 'Kg', 100, 23000.00, NULL, '2025-12-27 07:17:02', '2025-12-27 07:17:27'),
+(2, 'Ap1', 'Apel', 'Lokal', 'Kg', 200, 20000.00, NULL, '2025-12-27 07:17:20', '2025-12-27 07:17:20'),
+(3, 'Mg1', 'Mangga Harum Manis', 'Lokal', 'Kg', 20, 29000.00, NULL, '2025-12-27 07:17:56', '2025-12-27 07:17:56');
 
 -- --------------------------------------------------------
 
@@ -124,6 +137,13 @@ INSERT INTO `users` (`id`, `username`, `password`, `nama_lengkap`, `role`, `crea
 --
 
 --
+-- Indexes for table `data_penjualan`
+--
+ALTER TABLE `data_penjualan`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `produk_id` (`produk_id`);
+
+--
 -- Indexes for table `hasil_saw`
 --
 ALTER TABLE `hasil_saw`
@@ -136,14 +156,6 @@ ALTER TABLE `hasil_saw`
 ALTER TABLE `kriteria`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `kode_kriteria` (`kode_kriteria`);
-
---
--- Indexes for table `penilaian`
---
-ALTER TABLE `penilaian`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_penilaian` (`produk_id`,`kriteria_id`),
-  ADD KEY `kriteria_id` (`kriteria_id`);
 
 --
 -- Indexes for table `produk`
@@ -164,6 +176,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `data_penjualan`
+--
+ALTER TABLE `data_penjualan`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `hasil_saw`
 --
 ALTER TABLE `hasil_saw`
@@ -176,16 +194,10 @@ ALTER TABLE `kriteria`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `penilaian`
---
-ALTER TABLE `penilaian`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -198,17 +210,17 @@ ALTER TABLE `users`
 --
 
 --
+-- Constraints for table `data_penjualan`
+--
+ALTER TABLE `data_penjualan`
+  ADD CONSTRAINT `data_penjualan_ibfk_1` FOREIGN KEY (`produk_id`) REFERENCES `produk` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `hasil_saw`
 --
 ALTER TABLE `hasil_saw`
   ADD CONSTRAINT `hasil_saw_ibfk_1` FOREIGN KEY (`produk_id`) REFERENCES `produk` (`id`) ON DELETE CASCADE;
 
---
--- Constraints for table `penilaian`
---
-ALTER TABLE `penilaian`
-  ADD CONSTRAINT `penilaian_ibfk_1` FOREIGN KEY (`produk_id`) REFERENCES `produk` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `penilaian_ibfk_2` FOREIGN KEY (`kriteria_id`) REFERENCES `kriteria` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

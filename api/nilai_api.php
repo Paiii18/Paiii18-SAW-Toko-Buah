@@ -1,7 +1,7 @@
 <?php
 /**
  * Nilai API
- * Handle CRUD operations for penilaian (assessment values)
+ * Handle CRUD operations for data penjualan (sales data)
  */
 
 header('Content-Type: application/json');
@@ -21,19 +21,23 @@ try {
         case 'getAll':
             getAllNilai($conn);
             break;
-        
-        case 'getByProduk':
-            getNilaiByProduk($conn);
+
+        case 'getById':
+            getNilaiById($conn);
             break;
-        
-        case 'save':
-            saveNilai($conn);
+
+        case 'create':
+            createNilai($conn);
             break;
-        
+
+        case 'update':
+            updateNilai($conn);
+            break;
+
         case 'delete':
             deleteNilai($conn);
             break;
-        
+
         default:
             sendResponse(false, 'Invalid action');
             break;
@@ -44,158 +48,195 @@ try {
 }
 
 /**
- * Get all nilai grouped by product
+ * Get all data penjualan
  */
 function getAllNilai($conn) {
-    $query = "SELECT 
-                p.id as produk_id,
+    $query = "SELECT
+                dp.id,
+                dp.produk_id,
                 p.nama_produk,
-                MAX(CASE WHEN k.kode_kriteria = 'C1' THEN n.nilai END) as nilai_c1,
-                MAX(CASE WHEN k.kode_kriteria = 'C2' THEN n.nilai END) as nilai_c2,
-                MAX(CASE WHEN k.kode_kriteria = 'C3' THEN n.nilai END) as nilai_c3,
-                MAX(CASE WHEN k.kode_kriteria = 'C4' THEN n.nilai END) as nilai_c4,
-                MAX(CASE WHEN k.kode_kriteria = 'C5' THEN n.nilai END) as nilai_c5
-              FROM produk p
-              LEFT JOIN penilaian n ON p.id = n.produk_id
-              LEFT JOIN kriteria k ON n.kriteria_id = k.id
-              GROUP BY p.id, p.nama_produk
-              HAVING nilai_c1 IS NOT NULL
-              ORDER BY p.nama_produk";
-    
+                dp.bulan,
+                dp.tahun,
+                dp.kuantitas,
+                dp.pendapatan,
+                dp.margin,
+                dp.kerusakan,
+                dp.created_at
+              FROM data_penjualan dp
+              JOIN produk p ON dp.produk_id = p.id
+              ORDER BY dp.tahun DESC,
+                       FIELD(dp.bulan, 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember') DESC,
+                       dp.created_at DESC";
+
     $stmt = $conn->prepare($query);
     $stmt->execute();
-    
+
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     sendResponse(true, 'Data berhasil dimuat', $data);
 }
 
 /**
- * Get nilai by product ID
+ * Get data penjualan by ID
  */
-function getNilaiByProduk($conn) {
-    $produk_id = isset($_GET['produk_id']) ? $_GET['produk_id'] : null;
-    
-    if (!$produk_id) {
-        sendResponse(false, 'ID produk tidak ditemukan');
+function getNilaiById($conn) {
+    $id = isset($_GET['id']) ? $_GET['id'] : null;
+
+    if (!$id) {
+        sendResponse(false, 'ID tidak ditemukan');
     }
-    
-    $query = "SELECT 
-                n.id,
-                n.produk_id,
-                n.kriteria_id,
-                n.nilai,
-                k.kode_kriteria,
-                k.nama_kriteria
-              FROM penilaian n
-              JOIN kriteria k ON n.kriteria_id = k.id
-              WHERE n.produk_id = :produk_id
-              ORDER BY k.kode_kriteria";
-    
+
+    // Get data penjualan
+    $query = "SELECT
+                dp.id,
+                dp.produk_id,
+                p.nama_produk,
+                dp.bulan,
+                dp.tahun,
+                dp.kuantitas,
+                dp.pendapatan,
+                dp.margin,
+                dp.kerusakan
+              FROM data_penjualan dp
+              JOIN produk p ON dp.produk_id = p.id
+              WHERE dp.id = :id";
+
     $stmt = $conn->prepare($query);
-    $stmt->bindParam(':produk_id', $produk_id);
+    $stmt->bindParam(':id', $id);
     $stmt->execute();
-    
+
     if ($stmt->rowCount() > 0) {
-        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
         sendResponse(true, 'Data berhasil dimuat', $data);
     } else {
-        sendResponse(false, 'Data nilai tidak ditemukan');
+        sendResponse(false, 'Data penjualan tidak ditemukan');
     }
 }
 
 /**
- * Save nilai (insert or update)
+ * Create new data penjualan
  */
-function saveNilai($conn) {
+function createNilai($conn) {
     $produk_id = isset($_POST['produk_id']) ? trim($_POST['produk_id']) : '';
-    $nilai_data = isset($_POST['nilai_data']) ? $_POST['nilai_data'] : '';
-    
-    if (empty($produk_id) || empty($nilai_data)) {
+    $bulan = isset($_POST['bulan']) ? trim($_POST['bulan']) : '';
+    $tahun = isset($_POST['tahun']) ? trim($_POST['tahun']) : '';
+    $kuantitas = isset($_POST['kuantitas']) ? trim($_POST['kuantitas']) : 0;
+    $pendapatan = isset($_POST['pendapatan']) ? trim($_POST['pendapatan']) : 0;
+    $margin = isset($_POST['margin']) ? trim($_POST['margin']) : 0;
+    $kerusakan = isset($_POST['kerusakan']) ? trim($_POST['kerusakan']) : 0;
+
+    if (empty($produk_id) || empty($bulan) || empty($tahun)) {
         sendResponse(false, 'Data tidak lengkap!');
     }
-    
-    // Parse JSON data
-    $nilai_array = json_decode($nilai_data, true);
-    
-    if (!$nilai_array) {
-        sendResponse(false, 'Format data nilai tidak valid!');
-    }
-    
+
     // Check if product exists
     $checkProduk = "SELECT id FROM produk WHERE id = :produk_id";
     $checkStmt = $conn->prepare($checkProduk);
     $checkStmt->bindParam(':produk_id', $produk_id);
     $checkStmt->execute();
-    
+
     if ($checkStmt->rowCount() === 0) {
         sendResponse(false, 'Produk tidak ditemukan!');
     }
-    
-    // Begin transaction
-    $conn->beginTransaction();
-    
+
     try {
-        // Delete existing values for this product
-        $deleteQuery = "DELETE FROM penilaian WHERE produk_id = :produk_id";
-        $deleteStmt = $conn->prepare($deleteQuery);
-        $deleteStmt->bindParam(':produk_id', $produk_id);
-        $deleteStmt->execute();
-        
-        // Insert new values
-        $insertQuery = "INSERT INTO penilaian (produk_id, kriteria_id, nilai) 
-                       VALUES (:produk_id, :kriteria_id, :nilai)";
-        $insertStmt = $conn->prepare($insertQuery);
-        
-        foreach ($nilai_array as $item) {
-            $kriteria_id = $item['kriteria_id'];
-            $nilai = $item['nilai'];
-            
-            $insertStmt->bindParam(':produk_id', $produk_id);
-            $insertStmt->bindParam(':kriteria_id', $kriteria_id);
-            $insertStmt->bindParam(':nilai', $nilai);
-            $insertStmt->execute();
-        }
-        
-        // Commit transaction
-        $conn->commit();
-        sendResponse(true, 'Nilai berhasil disimpan!');
-        
+        // Insert data penjualan
+        $insertDP = "INSERT INTO data_penjualan (produk_id, bulan, tahun, kuantitas, pendapatan, margin, kerusakan)
+                     VALUES (:produk_id, :bulan, :tahun, :kuantitas, :pendapatan, :margin, :kerusakan)";
+
+        $stmtDP = $conn->prepare($insertDP);
+        $stmtDP->bindParam(':produk_id', $produk_id);
+        $stmtDP->bindParam(':bulan', $bulan);
+        $stmtDP->bindParam(':tahun', $tahun);
+        $stmtDP->bindParam(':kuantitas', $kuantitas);
+        $stmtDP->bindParam(':pendapatan', $pendapatan);
+        $stmtDP->bindParam(':margin', $margin);
+        $stmtDP->bindParam(':kerusakan', $kerusakan);
+        $stmtDP->execute();
+
+        sendResponse(true, 'Data penjualan berhasil ditambahkan!');
+
     } catch (Exception $e) {
-        // Rollback on error
-        $conn->rollBack();
-        sendResponse(false, 'Gagal menyimpan nilai: ' . $e->getMessage());
+        sendResponse(false, 'Gagal menyimpan data: ' . $e->getMessage());
     }
 }
 
 /**
- * Delete nilai by product ID
+ * Update data penjualan
+ */
+function updateNilai($conn) {
+    $id = isset($_POST['id']) ? $_POST['id'] : null;
+    $produk_id = isset($_POST['produk_id']) ? trim($_POST['produk_id']) : '';
+    $bulan = isset($_POST['bulan']) ? trim($_POST['bulan']) : '';
+    $tahun = isset($_POST['tahun']) ? trim($_POST['tahun']) : '';
+    $kuantitas = isset($_POST['kuantitas']) ? trim($_POST['kuantitas']) : 0;
+    $pendapatan = isset($_POST['pendapatan']) ? trim($_POST['pendapatan']) : 0;
+    $margin = isset($_POST['margin']) ? trim($_POST['margin']) : 0;
+    $kerusakan = isset($_POST['kerusakan']) ? trim($_POST['kerusakan']) : 0;
+
+    if (!$id || empty($produk_id) || empty($bulan) || empty($tahun)) {
+        sendResponse(false, 'Data tidak lengkap!');
+    }
+
+    try {
+        // Update data penjualan
+        $updateDP = "UPDATE data_penjualan
+                     SET produk_id = :produk_id,
+                         bulan = :bulan,
+                         tahun = :tahun,
+                         kuantitas = :kuantitas,
+                         pendapatan = :pendapatan,
+                         margin = :margin,
+                         kerusakan = :kerusakan
+                     WHERE id = :id";
+
+        $stmtDP = $conn->prepare($updateDP);
+        $stmtDP->bindParam(':produk_id', $produk_id);
+        $stmtDP->bindParam(':bulan', $bulan);
+        $stmtDP->bindParam(':tahun', $tahun);
+        $stmtDP->bindParam(':kuantitas', $kuantitas);
+        $stmtDP->bindParam(':pendapatan', $pendapatan);
+        $stmtDP->bindParam(':margin', $margin);
+        $stmtDP->bindParam(':kerusakan', $kerusakan);
+        $stmtDP->bindParam(':id', $id);
+        $stmtDP->execute();
+
+        sendResponse(true, 'Data penjualan berhasil diupdate!');
+
+    } catch (Exception $e) {
+        sendResponse(false, 'Gagal mengupdate data: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Delete data penjualan
  */
 function deleteNilai($conn) {
-    $produk_id = isset($_POST['produk_id']) ? $_POST['produk_id'] : null;
-    
-    if (!$produk_id) {
-        sendResponse(false, 'ID produk tidak ditemukan');
+    $id = isset($_POST['id']) ? $_POST['id'] : null;
+
+    if (!$id) {
+        sendResponse(false, 'ID tidak ditemukan');
     }
-    
-    // Check if nilai exists
-    $checkQuery = "SELECT id FROM penilaian WHERE produk_id = :produk_id";
+
+    // Check if data exists
+    $checkQuery = "SELECT produk_id FROM data_penjualan WHERE id = :id";
     $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bindParam(':produk_id', $produk_id);
+    $checkStmt->bindParam(':id', $id);
     $checkStmt->execute();
-    
+
     if ($checkStmt->rowCount() === 0) {
-        sendResponse(false, 'Data nilai tidak ditemukan');
+        sendResponse(false, 'Data penjualan tidak ditemukan');
     }
-    
-    // Delete nilai
-    $query = "DELETE FROM penilaian WHERE produk_id = :produk_id";
+
+    // Delete data penjualan
+    $query = "DELETE FROM data_penjualan WHERE id = :id";
     $stmt = $conn->prepare($query);
-    $stmt->bindParam(':produk_id', $produk_id);
-    
+    $stmt->bindParam(':id', $id);
+
     if ($stmt->execute()) {
-        sendResponse(true, 'Nilai berhasil dihapus!');
+        sendResponse(true, 'Data penjualan berhasil dihapus!');
     } else {
-        sendResponse(false, 'Gagal menghapus nilai');
+        sendResponse(false, 'Gagal menghapus data');
     }
 }
 ?>

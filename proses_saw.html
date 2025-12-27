@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perhitungan SAW - SPK Toko Buah Segar Manis</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .saw-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .saw-section h3 {
+        margin-bottom: 15px;
+        color: #333;
+        border-bottom: 2px solid #4caf50;
+        padding-bottom: 10px;
+      }
+      .matrix-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      .matrix-table th,
+      .matrix-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+      .matrix-table th {
+        background: #4caf50;
+        color: white;
+      }
+      .matrix-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+      .matrix-table tr:hover {
+        background: #f1f1f1;
+      }
+      .ranking-1 {
+        background: #ffd700 !important;
+        font-weight: bold;
+      }
+      .ranking-2 {
+        background: #c0c0c0 !important;
+      }
+      .ranking-3 {
+        background: #cd7f32 !important;
+        color: white;
+      }
+      .btn-calculate {
+        background: linear-gradient(135deg, #4caf50, #45a049);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-calculate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      }
+      .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 0 8px 8px 0;
+      }
+      .info-box h4 {
+        margin: 0 0 10px 0;
+        color: #1976d2;
+      }
+      .info-box ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .kriteria-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .badge-benefit {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .badge-cost {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .result-highlight {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4caf50;
+      }
+      .step-indicator {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #f5f5f5;
+        border-radius: 20px;
+        font-size: 14px;
+      }
+      .step.active {
+        background: #4caf50;
+        color: white;
+      }
+      .step-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+      }
+      .step.active .step-number {
+        background: white;
+        color: #4caf50;
+      }
+    </style>
+  </head>
+  <body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">🍎</div>
+          <div class="logo-text">
+            <h3>Segar Manis</h3>
+            <p>Bogor</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="input_produk.html" class="nav-item">
+          <span class="icon">📦</span>
+          <span>Produk</span>
+        </a>
+        <a href="input_kriteria.html" class="nav-item">
+          <span class="icon">⚖️</span>
+          <span>Kriteria</span>
+        </a>
+        <a href="input_nilai.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Data Penjualan</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item active">
+          <span class="icon">🧮</span>
+          <span>Perhitungan SAW</span>
+        </a>
+        <a href="laporan.html" class="nav-item">
+          <span class="icon">📄</span>
+          <span>Laporan</span>
+        </a>
+        <a href="master_data.html" class="nav-item">
+          <span class="icon">👤</span>
+          <span>Pengguna</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="toggle-menu" onclick="toggleSidebar()">
+          <span>◀</span>
+          <span>Tutup Menu</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="search-box">
+          <input type="text" placeholder="Cari..." disabled />
+          <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="topbar-right">
+          <div class="notification">
+            <span class="icon">🔔</span>
+            <span class="badge">3</span>
+          </div>
+
+          <div class="user-profile">
+            <div class="avatar">A</div>
+            <div class="user-info">
+              <span class="user-name" id="userName">Administrator</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">▼</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dashboard-content">
+        <div class="page-header">
+          <div>
+            <h1>Perhitungan SAW</h1>
+            <p>Simple Additive Weighting - Metode Penjumlahan Terbobot</p>
+          </div>
+          <button class="btn-calculate" onclick="calculateSAW()">
+            <span>🧮</span> Hitung SAW
+          </button>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <h4>Langkah-langkah Metode SAW:</h4>
+          <ul>
+            <li><strong>Langkah 1:</strong> Menentukan kriteria dan bobot</li>
+            <li><strong>Langkah 2:</strong> Membuat matriks keputusan</li>
+            <li>
+              <strong>Langkah 3:</strong> Normalisasi matriks (Benefit: nilai/max, Cost: min/nilai)
+            </li>
+            <li>
+              <strong>Langkah 4:</strong> Menghitung nilai preferensi (V = bobot x normalisasi)
+            </li>
+            <li><strong>Langkah 5:</strong> Perankingan berdasarkan nilai preferensi</li>
+          </ul>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert alert-warning" id="alertBox" style="display: none">
+          <span id="alertIcon">⚠️</span>
+          <span id="alertMessage"></span>
+        </div>
+
+        <!-- Step 1: Kriteria -->
+        <div class="saw-section" id="sectionKriteria">
+          <h3>1. Data Kriteria dan Bobot</h3>
+          <table class="matrix-table" id="kriteriaTable">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama Kriteria</th>
+                <th>Bobot</th>
+                <th>Jenis</th>
+              </tr>
+            </thead>
+            <tbody id="kriteriaBody">
+              <tr>
+                <td colspan="4">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Step 2: Decision Matrix -->
+        <div class="saw-section" id="sectionMatrix">
+          <h3>2. Matriks Keputusan</h3>
+          <div class="table-responsive">
+            <table class="matrix-table" id="matrixTable">
+              <thead id="matrixHead">
+                <tr>
+                  <th>Alternatif</th>
+                </tr>
+              </thead>
+              <tbody id="matrixBody">
+                <tr>
+                  <td colspan="6">Klik "Hitung SAW" untuk memulai perhitungan</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 3: Normalized Matrix -->
+        <div class="saw-section" id="sectionNormalized" style="display: none">
+          <h3>3. Matriks Ternormalisasi</h3>
+          <p style="color: #666; margin-bottom: 15px">
+            <em>Benefit: rij = Xij / Max(Xij) | Cost: rij = Min(Xij) / Xij</em>
+          </p>
+          <div class="table-responsive">
+            <table class="matrix-table" id="normalizedTable">
+              <thead id="normalizedHead">
+                <tr>
+                  <th>Alternatif</th>
+                </tr>
+              </thead>
+              <tbody id="normalizedBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 4: Weighted Values -->
+        <div class="saw-section" id="sectionWeighted" style="display: none">
+          <h3>4. Nilai Preferensi (V = W x R)</h3>
+          <div class="table-responsive">
+            <table class="matrix-table" id="weightedTable">
+              <thead id="weightedHead">
+                <tr>
+                  <th>Alternatif</th>
+                </tr>
+              </thead>
+              <tbody id="weightedBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 5: Ranking -->
+        <div class="saw-section" id="sectionRanking" style="display: none">
+          <h3>5. Hasil Perankingan</h3>
+          <table class="matrix-table" id="rankingTable">
+            <thead>
+              <tr>
+                <th>Ranking</th>
+                <th>Produk</th>
+                <th>Nilai Preferensi</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/saw.js"></script>
+    <script>
+      // Auth check
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+      if (!isLoggedIn || isLoggedIn !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // Load user data
+      const userData = JSON.parse(sessionStorage.getItem("user") || "{}");
+      if (userData.nama_lengkap) {
+        document.getElementById("userName").textContent = userData.nama_lengkap;
+        document.querySelector(".avatar").textContent = userData.nama_lengkap
+          .charAt(0)
+          .toUpperCase();
+      }
+
+      // Logout
+      async function handleLogout() {
+        if (!confirm("Apakah Anda yakin ingin logout?")) return;
+        try {
+          await fetch("api/logout_api.php", { method: "POST" });
+        } catch (e) {}
+        sessionStorage.clear();
+        window.location.href = "login.html";
+      }
+
+      // Toggle sidebar
+      function toggleSidebar() {
+        const sidebar = document.querySelector(".sidebar");
+        const mainContent = document.querySelector(".main-content");
+        sidebar.classList.toggle("collapsed");
+        mainContent.style.marginLeft = sidebar.classList.contains("collapsed")
+          ? "70px"
+          : "250px";
+      }
+    </script>
+  </body>
+</html>

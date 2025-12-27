@@ -1,18 +1,16 @@
 /**
- * Nilai Manager - Handle CRUD operations for penilaian
+ * Nilai Manager - Handle CRUD operations for data penjualan
  */
 
 class NilaiManager {
   constructor() {
     this.apiUrl = "api/nilai_api.php";
     this.produkList = [];
-    this.kriteriaList = [];
     this.nilaiList = [];
     this.init();
   }
 
   async init() {
-    await this.loadKriteria();
     await this.loadProduk();
     await this.loadNilai();
     this.setupEventListeners();
@@ -20,8 +18,7 @@ class NilaiManager {
 
   setupEventListeners() {
     const form = document.getElementById("formNilai");
-    const searchInput = document.getElementById("searchNilai");
-    const filterSelect = document.getElementById("filterKategori");
+    const searchInput = document.getElementById("searchPenjualan");
 
     if (form) {
       form.addEventListener("submit", (e) => this.handleSubmit(e));
@@ -31,27 +28,6 @@ class NilaiManager {
       searchInput.addEventListener("input", (e) =>
         this.handleSearch(e.target.value)
       );
-    }
-
-    if (filterSelect) {
-      filterSelect.addEventListener("change", (e) =>
-        this.handleFilter(e.target.value)
-      );
-    }
-  }
-
-  async loadKriteria() {
-    try {
-      const response = await fetch("api/kriteria_api.php?action=getAll");
-      const result = await response.json();
-
-      if (result.success) {
-        this.kriteriaList = result.data;
-        this.renderKriteriaHeaders();
-        this.renderKriteriaInputs();
-      }
-    } catch (error) {
-      console.error("Error loading kriteria:", error);
     }
   }
 
@@ -63,7 +39,6 @@ class NilaiManager {
       if (result.success) {
         this.produkList = result.data;
         this.renderProdukDropdown();
-        this.renderFilterDropdown();
       }
     } catch (error) {
       console.error("Error loading produk:", error);
@@ -83,44 +58,8 @@ class NilaiManager {
       }
     } catch (error) {
       console.error("Error:", error);
-      this.showMessage("error", "Gagal memuat data nilai");
+      this.showMessage("error", "Gagal memuat data penjualan");
     }
-  }
-
-  renderKriteriaHeaders() {
-    this.kriteriaList.forEach((kriteria, index) => {
-      const header = document.getElementById(`headerC${index + 1}`);
-      if (header) {
-        header.textContent = kriteria.kode_kriteria;
-        header.title = kriteria.nama_kriteria;
-      }
-    });
-  }
-
-  renderKriteriaInputs() {
-    const container = document.getElementById("kriteriaInputs");
-    if (!container) return;
-
-    container.innerHTML = this.kriteriaList
-      .map(
-        (kriteria) => `
-      <div class="form-group">
-        <label for="nilai_${kriteria.id}">
-          ${kriteria.kode_kriteria} - ${kriteria.nama_kriteria}
-          <span class="required">*</span>
-        </label>
-        <input
-          type="number"
-          id="nilai_${kriteria.id}"
-          name="nilai_${kriteria.id}"
-          step="0.01"
-          required
-          placeholder="Masukkan nilai"
-        />
-      </div>
-    `
-      )
-      .join("");
   }
 
   renderProdukDropdown() {
@@ -137,20 +76,6 @@ class NilaiManager {
     select.innerHTML = '<option value="">-- Pilih Produk --</option>' + options;
   }
 
-  renderFilterDropdown() {
-    const select = document.getElementById("filterKategori");
-    if (!select) return;
-
-    const options = this.produkList
-      .map(
-        (produk) =>
-          `<option value="${produk.id}">${produk.nama_produk}</option>`
-      )
-      .join("");
-
-    select.innerHTML = '<option value="">Semua Produk</option>' + options;
-  }
-
   renderTable(data = this.nilaiList) {
     const tbody = document.getElementById("nilaiTableBody");
     if (!tbody) return;
@@ -158,7 +83,7 @@ class NilaiManager {
     if (data.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9" class="text-center">Belum ada data penilaian</td>
+          <td colspan="8" class="text-center">Belum ada data penjualan</td>
         </tr>
       `;
       return;
@@ -166,26 +91,22 @@ class NilaiManager {
 
     tbody.innerHTML = data
       .map(
-        (item, index) => `
+        (item) => `
       <tr>
-        <td>${index + 1}</td>
         <td>${item.nama_produk}</td>
-        <td>${this.formatNilai(item.nilai_c1)}</td>
-        <td>${this.formatNilai(item.nilai_c2)}</td>
-        <td>${this.formatNilai(item.nilai_c3)}</td>
-        <td>${this.formatNilai(item.nilai_c4)}</td>
-        <td>${this.formatNilai(item.nilai_c5)}</td>
+        <td>${item.bulan}</td>
+        <td>${item.tahun}</td>
+        <td>${this.formatNumber(item.kuantitas)} unit</td>
+        <td>Rp ${this.formatCurrency(item.pendapatan)}</td>
+        <td>${parseFloat(item.margin || 0).toFixed(1)}%</td>
+        <td>${parseFloat(item.kerusakan || 0).toFixed(1)}%</td>
         <td>
           <div class="action-buttons">
-            <button class="btn-edit" onclick="nilaiManager.editNilai(${
-              item.produk_id
-            })">
-              Edit
+            <button class="btn-edit" onclick="nilaiManager.editNilai(${item.id})">
+              ✏️
             </button>
-            <button class="btn-delete" onclick="nilaiManager.deleteNilai(${
-              item.produk_id
-            })">
-              Hapus
+            <button class="btn-delete" onclick="nilaiManager.deleteNilai(${item.id})">
+              🗑️
             </button>
           </div>
         </td>
@@ -195,31 +116,45 @@ class NilaiManager {
       .join("");
   }
 
-  formatNilai(nilai) {
-    return nilai ? parseFloat(nilai).toFixed(2) : "0.00";
+  formatNumber(num) {
+    return num ? parseFloat(num).toLocaleString("id-ID") : "0";
+  }
+
+  formatCurrency(num) {
+    return num ? parseFloat(num).toLocaleString("id-ID") : "0";
   }
 
   async handleSubmit(e) {
     e.preventDefault();
 
+    const id =
+      document.getElementById("isEdit").value === "true"
+        ? this.currentEditId
+        : null;
     const produkId = document.getElementById("produkId").value;
-    const isEdit = document.getElementById("isEdit").value === "true";
+    const bulan = document.getElementById("bulan").value;
+    const tahun = document.getElementById("tahun").value;
+    const kuantitas = document.getElementById("kuantitas").value;
+    const pendapatan = document.getElementById("pendapatan").value;
+    const margin = document.getElementById("margin").value;
+    const kerusakan = document.getElementById("kerusakan").value;
 
-    if (!produkId) {
-      this.showMessage("error", "Pilih produk terlebih dahulu!");
+    if (!produkId || !bulan || !tahun || !kuantitas || !pendapatan || !margin || !kerusakan) {
+      this.showMessage("error", "Mohon lengkapi semua field yang wajib diisi!");
       return;
     }
 
-    const nilaiData = this.kriteriaList.map((kriteria) => ({
-      kriteria_id: kriteria.id,
-      nilai: document.getElementById(`nilai_${kriteria.id}`).value,
-    }));
-
     try {
       const formData = new FormData();
-      formData.append("action", "save");
+      formData.append("action", id ? "update" : "create");
+      if (id) formData.append("id", id);
       formData.append("produk_id", produkId);
-      formData.append("nilai_data", JSON.stringify(nilaiData));
+      formData.append("bulan", bulan);
+      formData.append("tahun", tahun);
+      formData.append("kuantitas", kuantitas);
+      formData.append("pendapatan", pendapatan);
+      formData.append("margin", margin);
+      formData.append("kerusakan", kerusakan);
 
       const response = await fetch(this.apiUrl, {
         method: "POST",
@@ -231,7 +166,9 @@ class NilaiManager {
       if (result.success) {
         this.showMessage(
           "success",
-          isEdit ? "Nilai berhasil diupdate!" : "Nilai berhasil ditambahkan!"
+          id
+            ? "Data penjualan berhasil diupdate!"
+            : "Data penjualan berhasil ditambahkan!"
         );
         closeModal();
         this.loadNilai();
@@ -244,26 +181,26 @@ class NilaiManager {
     }
   }
 
-  async editNilai(produkId) {
+  async editNilai(id) {
     try {
-      const response = await fetch(
-        `${this.apiUrl}?action=getByProduk&produk_id=${produkId}`
-      );
+      const response = await fetch(`${this.apiUrl}?action=getById&id=${id}`);
       const result = await response.json();
 
       if (result.success) {
-        document.getElementById("modalTitle").textContent =
-          "Edit Nilai Penilaian";
-        document.getElementById("isEdit").value = "true";
-        document.getElementById("produkId").value = produkId;
-        document.getElementById("produkId").disabled = true;
+        const data = result.data;
 
-        result.data.forEach((item) => {
-          const input = document.getElementById(`nilai_${item.kriteria_id}`);
-          if (input) {
-            input.value = item.nilai;
-          }
-        });
+        document.getElementById("modalTitle").textContent =
+          "Edit Data Penjualan";
+        document.getElementById("isEdit").value = "true";
+        this.currentEditId = id;
+
+        document.getElementById("produkId").value = data.produk_id;
+        document.getElementById("bulan").value = data.bulan;
+        document.getElementById("tahun").value = data.tahun;
+        document.getElementById("kuantitas").value = data.kuantitas;
+        document.getElementById("pendapatan").value = data.pendapatan;
+        document.getElementById("margin").value = data.margin || 0;
+        document.getElementById("kerusakan").value = data.kerusakan || 0;
 
         openModal();
       } else {
@@ -271,17 +208,17 @@ class NilaiManager {
       }
     } catch (error) {
       console.error("Error:", error);
-      this.showMessage("error", "Gagal memuat data nilai");
+      this.showMessage("error", "Gagal memuat data penjualan");
     }
   }
 
-  async deleteNilai(produkId) {
-    if (!confirm("Yakin ingin menghapus semua nilai produk ini?")) return;
+  async deleteNilai(id) {
+    if (!confirm("Yakin ingin menghapus data penjualan ini?")) return;
 
     try {
       const formData = new FormData();
       formData.append("action", "delete");
-      formData.append("produk_id", produkId);
+      formData.append("id", id);
 
       const response = await fetch(this.apiUrl, {
         method: "POST",
@@ -291,7 +228,7 @@ class NilaiManager {
       const result = await response.json();
 
       if (result.success) {
-        this.showMessage("success", "Nilai berhasil dihapus!");
+        this.showMessage("success", "Data penjualan berhasil dihapus!");
         this.loadNilai();
       } else {
         this.showMessage("error", result.message);
@@ -303,20 +240,11 @@ class NilaiManager {
   }
 
   handleSearch(keyword) {
-    const filtered = this.nilaiList.filter((item) =>
-      item.nama_produk.toLowerCase().includes(keyword.toLowerCase())
-    );
-    this.renderTable(filtered);
-  }
-
-  handleFilter(produkId) {
-    if (!produkId) {
-      this.renderTable();
-      return;
-    }
-
     const filtered = this.nilaiList.filter(
-      (item) => item.produk_id == produkId
+      (item) =>
+        item.nama_produk.toLowerCase().includes(keyword.toLowerCase()) ||
+        item.bulan.toLowerCase().includes(keyword.toLowerCase()) ||
+        item.tahun.toString().includes(keyword)
     );
     this.renderTable(filtered);
   }
@@ -325,10 +253,9 @@ class NilaiManager {
     const form = document.getElementById("formNilai");
     if (form) form.reset();
 
-    document.getElementById("modalTitle").textContent =
-      "Tambah Nilai Penilaian";
+    document.getElementById("modalTitle").textContent = "Tambah Data Penjualan";
     document.getElementById("isEdit").value = "false";
-    document.getElementById("produkId").disabled = false;
+    this.currentEditId = null;
   }
 
   showMessage(type, message) {
