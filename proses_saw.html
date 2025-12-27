@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perhitungan SAW - SPK Toko Buah Segar Manis</title>
+    <link rel="icon" type="image/png" href="asset/images/logo.png" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <img
+              src="asset/images/logo.png"
+              alt="Logo"
+              style="width: 100%; height: 100%; object-fit: contain"
+            />
+          </div>
+          <div class="logo-text">
+            <h3>Buah Segar Manis</h3>
+            <p>Bogor</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="input_produk.html" class="nav-item">
+          <span class="icon">📦</span>
+          <span>Produk</span>
+        </a>
+        <a href="input_kriteria.html" class="nav-item">
+          <span class="icon">⚖️</span>
+          <span>Kriteria</span>
+        </a>
+        <a href="input_nilai.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Data Penjualan</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item active">
+          <span class="icon">🧮</span>
+          <span>Perhitungan SAW</span>
+        </a>
+        <a href="laporan.html" class="nav-item">
+          <span class="icon">📄</span>
+          <span>Laporan</span>
+        </a>
+              </nav>
+
+      <div class="sidebar-footer">
+        <button class="toggle-menu" onclick="toggleSidebar()">
+          <span>◀</span>
+          <span>Tutup Menu</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+        <div class="topbar-title">
+          <h2>Perhitungan SAW</h2>
+        </div>
+
+        <div class="topbar-right">
+          <div class="user-profile" onclick="toggleUserDropdown()">
+            <div class="avatar">A</div>
+            <div class="user-info">
+              <span class="user-name" id="userName">Administrator</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <button class="logout-btn">▼</button>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="#" onclick="handleLogout(); return false;">Keluar</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dashboard-content">
+        <div class="page-header">
+          <div>
+            <h1>Perhitungan SAW</h1>
+            <p>Simple Additive Weighting - Metode Penjumlahan Terbobot</p>
+          </div>
+          <button class="btn-calculate" onclick="calculateSAW()">
+            <span>🧮</span> Hitung SAW
+          </button>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <h4>Langkah-langkah Metode SAW:</h4>
+          <ul>
+            <li><strong>Langkah 1:</strong> Menentukan kriteria dan bobot</li>
+            <li><strong>Langkah 2:</strong> Membuat matriks keputusan</li>
+            <li>
+              <strong>Langkah 3:</strong> Normalisasi matriks (Benefit:
+              nilai/max, Cost: min/nilai)
+            </li>
+            <li>
+              <strong>Langkah 4:</strong> Menghitung nilai preferensi (V = bobot
+              x normalisasi)
+            </li>
+            <li>
+              <strong>Langkah 5:</strong> Perankingan berdasarkan nilai
+              preferensi
+            </li>
+          </ul>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert alert-warning" id="alertBox" style="display: none">
+          <span id="alertIcon">⚠️</span>
+          <span id="alertMessage"></span>
+        </div>
+
+        <!-- Step 1: Kriteria -->
+        <div class="saw-section" id="sectionKriteria">
+          <h3>1. Data Kriteria dan Bobot</h3>
+          <table class="matrix-table" id="kriteriaTable">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama Kriteria</th>
+                <th>Bobot</th>
+                <th>Jenis</th>
+              </tr>
+            </thead>
+            <tbody id="kriteriaBody">
+              <tr>
+                <td colspan="4">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Step 2: Decision Matrix -->
+        <div class="saw-section" id="sectionMatrix">
+          <h3>2. Matriks Keputusan</h3>
+          <div class="table-responsive">
+            <table class="matrix-table" id="matrixTable">
+              <thead id="matrixHead">
+                <tr>
+                  <th>Alternatif</th>
+                </tr>
+              </thead>
+              <tbody id="matrixBody">
+                <tr>
+                  <td colspan="6">
+                    Klik "Hitung SAW" untuk memulai perhitungan
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 3: Normalized Matrix -->
+        <div class="saw-section" id="sectionNormalized" style="display: none">
+          <h3>3. Matriks Ternormalisasi</h3>
+          <p style="color: #666; margin-bottom: 15px">
+            <em>Benefit: rij = Xij / Max(Xij) | Cost: rij = Min(Xij) / Xij</em>
+          </p>
+          <div class="table-responsive">
+            <table class="matrix-table" id="normalizedTable">
+              <thead id="normalizedHead">
+                <tr>
+                  <th>Alternatif</th>
+                </tr>
+              </thead>
+              <tbody id="normalizedBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 4: Weighted Values -->
+        <div class="saw-section" id="sectionWeighted" style="display: none">
+          <h3>4. Nilai Preferensi (V = W x R)</h3>
+          <div class="table-responsive">
+            <table class="matrix-table" id="weightedTable">
+              <thead id="weightedHead">
+                <tr>
+                  <th>Alternatif</th>
+                </tr>
+              </thead>
+              <tbody id="weightedBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 5: Ranking -->
+        <div class="saw-section" id="sectionRanking" style="display: none">
+          <h3>5. Hasil Perankingan</h3>
+          <table class="matrix-table" id="rankingTable">
+            <thead>
+              <tr>
+                <th>Ranking</th>
+                <th>Produk</th>
+                <th>Nilai Preferensi</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/saw.js"></script>
+    <script>
+      // Auth check
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+      if (!isLoggedIn || isLoggedIn !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // Load user data
+      const userData = JSON.parse(sessionStorage.getItem("user") || "{}");
+      if (userData.nama_lengkap) {
+        document.getElementById("userName").textContent = userData.nama_lengkap;
+        document.querySelector(".avatar").textContent = userData.nama_lengkap
+          .charAt(0)
+          .toUpperCase();
+      }
+
+    </script>
+  </body>
+</html>

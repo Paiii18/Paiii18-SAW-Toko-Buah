@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laporan - SPK Toko Buah Segar Manis</title>
+    <link rel="icon" type="image/png" href="asset/images/logo.png" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <img
+              src="asset/images/logo.png"
+              alt="Logo"
+              style="width: 100%; height: 100%; object-fit: contain"
+            />
+          </div>
+          <div class="logo-text">
+            <h3>Buah Segar Manis</h3>
+            <p>Bogor</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="input_produk.html" class="nav-item">
+          <span class="icon">📦</span>
+          <span>Produk</span>
+        </a>
+        <a href="input_kriteria.html" class="nav-item">
+          <span class="icon">⚖️</span>
+          <span>Kriteria</span>
+        </a>
+        <a href="input_nilai.html" class="nav-item">
+          <span class="icon">📊</span>
+          <span>Data Penjualan</span>
+        </a>
+        <a href="proses_saw.html" class="nav-item">
+          <span class="icon">🧮</span>
+          <span>Perhitungan SAW</span>
+        </a>
+        <a href="laporan.html" class="nav-item active">
+          <span class="icon">📄</span>
+          <span>Laporan</span>
+        </a>
+              </nav>
+
+      <div class="sidebar-footer">
+        <button class="toggle-menu" onclick="toggleSidebar()">
+          <span>◀</span>
+          <span>Tutup Menu</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+        <div class="topbar-title">
+          <h2>Laporan</h2>
+        </div>
+
+        <div class="topbar-right">
+          <div class="user-profile" onclick="toggleUserDropdown()">
+            <div class="avatar">A</div>
+            <div class="user-info">
+              <span class="user-name" id="userName">Administrator</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <button class="logout-btn">▼</button>
+            <div class="user-dropdown" id="userDropdown">
+              <a href="#" onclick="handleLogout(); return false;">Keluar</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="dashboard-content">
+        <div class="page-header">
+          <div>
+            <h1>Laporan</h1>
+            <p>Cetak laporan data dan hasil perhitungan</p>
+          </div>
+        </div>
+
+        <!-- Report Tabs -->
+        <div class="report-tabs">
+          <button class="report-tab active" onclick="showReport('produk')">
+            📦 Laporan Produk
+          </button>
+          <button class="report-tab" onclick="showReport('kriteria')">
+            ⚖️ Laporan Kriteria
+          </button>
+          <button class="report-tab" onclick="showReport('penjualan')">
+            📊 Laporan Penjualan
+          </button>
+          <button class="report-tab" onclick="showReport('saw')">
+            🏆 Laporan Hasil SAW
+          </button>
+        </div>
+
+        <!-- Report: Produk -->
+        <div id="report-produk" class="report-content active">
+          <div class="report-container">
+            <div class="report-actions">
+              <button class="btn-print" onclick="printReport('produk')">
+                🖨️ Cetak Laporan
+              </button>
+              <span style="color: #666; font-size: 14px"
+                >Laporan Data Produk</span
+              >
+            </div>
+            <div class="report-preview">
+              <div class="report-paper" id="paper-produk">
+                <!-- Content will be loaded by JS -->
+                <p style="text-align: center; color: #999">Memuat data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report: Kriteria -->
+        <div id="report-kriteria" class="report-content">
+          <div class="report-container">
+            <div class="report-actions">
+              <button class="btn-print" onclick="printReport('kriteria')">
+                🖨️ Cetak Laporan
+              </button>
+              <span style="color: #666; font-size: 14px"
+                >Laporan Data Kriteria</span
+              >
+            </div>
+            <div class="report-preview">
+              <div class="report-paper" id="paper-kriteria">
+                <p style="text-align: center; color: #999">Memuat data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report: Penjualan -->
+        <div id="report-penjualan" class="report-content">
+          <div class="report-container">
+            <div class="report-actions">
+              <button class="btn-print" onclick="printReport('penjualan')">
+                🖨️ Cetak Laporan
+              </button>
+              <span style="color: #666; font-size: 14px"
+                >Laporan Data Penjualan</span
+              >
+            </div>
+            <div class="report-preview">
+              <div class="report-paper" id="paper-penjualan">
+                <p style="text-align: center; color: #999">Memuat data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Report: Hasil SAW -->
+        <div id="report-saw" class="report-content">
+          <div class="report-container">
+            <div class="report-actions">
+              <button class="btn-print" onclick="printReport('saw')">
+                🖨️ Cetak Laporan
+              </button>
+              <span style="color: #666; font-size: 14px"
+                >Laporan Hasil Perhitungan SAW</span
+              >
+            </div>
+            <div class="report-preview">
+              <div class="report-paper" id="paper-saw">
+                <p style="text-align: center; color: #999">Memuat data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/laporan.js"></script>
+    <script>
+      // Auth check
+      const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+      if (!isLoggedIn || isLoggedIn !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // Load user data
+      const userData = JSON.parse(sessionStorage.getItem("user") || "{}");
+      if (userData.nama_lengkap) {
+        document.getElementById("userName").textContent = userData.nama_lengkap;
+        document.querySelector(".avatar").textContent = userData.nama_lengkap
+          .charAt(0)
+          .toUpperCase();
+      }
+
+
+      // Show report tab
+      function showReport(type) {
+        // Update tabs
+        document.querySelectorAll(".report-tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // Update content
+        document.querySelectorAll(".report-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+        document.getElementById(`report-${type}`).classList.add("active");
+      }
+
+      // Print report
+      function printReport(type) {
+        const paper = document.getElementById(`paper-${type}`);
+        const printWindow = window.open("", "_blank");
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Cetak Laporan</title>
+              <style>
+                body {
+                  font-family: "Times New Roman", serif;
+                  font-size: 12pt;
+                  line-height: 1.6;
+                  padding: 20px;
+                }
+                .report-header {
+                  text-align: center;
+                  border-bottom: 3px double #000;
+                  padding-bottom: 15px;
+                  margin-bottom: 20px;
+                }
+                .report-header h1 { font-size: 18pt; margin: 0; }
+                .report-header h2 { font-size: 14pt; margin: 5px 0; font-weight: normal; }
+                .report-header p { margin: 5px 0; font-size: 10pt; }
+                .report-title { text-align: center; margin: 30px 0; }
+                .report-title h3 { font-size: 14pt; text-decoration: underline; margin: 0; }
+                .report-date { text-align: right; margin-bottom: 20px; }
+                .report-table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin: 20px 0;
+                  font-size: 11pt;
+                }
+                .report-table th, .report-table td {
+                  border: 1px solid #000;
+                  padding: 8px 10px;
+                  text-align: left;
+                }
+                .report-table th {
+                  background: #f0f0f0;
+                  font-weight: bold;
+                  text-align: center;
+                }
+                .report-table td.center { text-align: center; }
+                .report-table td.right { text-align: right; }
+                .report-footer {
+                  margin-top: 50px;
+                  display: flex;
+                  justify-content: space-between;
+                }
+                .signature-box {
+                  text-align: center;
+                  width: 200px;
+                }
+                .signature-box .title { margin-bottom: 80px; }
+                .signature-box .name {
+                  border-top: 1px solid #000;
+                  padding-top: 5px;
+                  font-weight: bold;
+                }
+                .ranking-badge {
+                  display: inline-block;
+                  padding: 2px 8px;
+                  border-radius: 4px;
+                  font-weight: bold;
+                }
+                .rank-1 { background: #ffd700; }
+                .rank-2 { background: #c0c0c0; }
+                .rank-3 { background: #cd7f32; color: white; }
+              </style>
+            </head>
+            <body>
+              ${paper.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 250);
+      }
+    </script>
+  </body>
+</html>
